@@ -1,0 +1,46 @@
+syntax = "proto3";
+//this belongs to this microservice
+package table;
+
+//Methods exposed to client
+service TableService {
+  rpc getAll (Empty) returns (GetAllReply){}
+  rpc get ( GetRequest ) returns ( GetReply ){}
+  rpc create (CreateRequest) returns (CreateReply){}
+  rpc update ( UpdateRequest ) returns (CreateReply){}
+  rpc delete ( DeleteRequest ) returns (Empty){}
+}
+
+message Empty {
+}
+
+message GetRequest {
+   string _id = 1;
+}
+
+message GetReply {
+  string _id = 1;
+  string name = 2;
+}
+
+message GetAllReply {
+  repeated GetReply tables = 1;
+}
+
+message CreateRequest {
+  string name = 1;
+  int32 owner = 3;
+}
+
+message CreateReply {
+  string _id = 1;
+}
+
+message UpdateRequest {
+  string _id = 1;
+  string name = 2;
+}
+
+message DeleteRequest{
+  string _id = 1;
+}

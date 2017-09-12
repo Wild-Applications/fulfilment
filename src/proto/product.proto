@@ -1,0 +1,62 @@
+syntax = "proto3";
+//this belongs to this microservice
+package product;
+
+
+//Methods exposed to client
+service ProductService {
+  rpc getAll (Empty) returns (GetAllReply){}
+  rpc get (GetRequest) returns (GetReply){}
+  rpc getBatch( BatchRequest ) returns (BatchReply){}
+  rpc create (CreateRequest) returns (CreateReply){}
+  rpc update ( UpdateRequest ) returns (CreateReply){}
+  rpc delete ( DeleteRequest ) returns (Empty){}
+}
+
+message Empty {
+}
+
+message GetRequest {
+  string _id = 1;
+}
+
+message GetReply {
+  string _id = 1;
+  string name = 2;
+  string description = 3;
+  double price = 4;
+}
+
+
+
+message BatchRequest {
+  repeated string ids = 1;
+}
+
+message BatchReply{
+  repeated GetReply products = 1;
+}
+
+message GetAllReply {
+  repeated GetReply products = 1;
+}
+
+message CreateRequest {
+  string name = 1;
+  string description = 2;
+  double price = 3;
+  int32 owner = 4;
+}
+
+message CreateReply {
+  string _id = 1;
+}
+
+message UpdateRequest {
+  string _id = 1;
+  string name = 2;
+}
+
+message DeleteRequest{
+  string _id = 1;
+}

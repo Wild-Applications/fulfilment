@@ -1,0 +1,63 @@
+syntax = "proto3";
+//this belongs to this microservice
+package order;
+
+
+import "./product.proto";
+import './table.proto';
+
+//Methods exposed to client
+service FulfilmentService {
+  rpc getAll (Empty) returns (GetAllReply){}
+  rpc get (GetRequest) returns (GetReply){}
+  rpc create (CreateRequest) returns (CreateReply){}
+  rpc update ( UpdateRequest ) returns (CreateReply){}
+  rpc delete ( DeleteRequest ) returns (Empty){}
+}
+
+message Empty {
+}
+
+message GetRequest {
+  string _id = 1;
+}
+
+message GetReply {
+  string _id = 1;
+  double subtotal = 2;
+  repeated product.GetReply products = 3;
+  table.GetReply table = 4;
+  string premises = 5;
+  string status = 6;
+  int32 owner = 7;
+  string createdAt = 8;
+}
+
+
+message GetAllReply {
+  repeated GetReply orders = 1;
+}
+
+message CreateRequest {
+  int32 owner = 1;
+  double subtotal = 2;
+  string premises = 3;
+  string table = 4;
+  repeated string products = 5;
+}
+
+message CreateReply {
+  string _id = 1;
+}
+
+message UpdateRequest {
+  string _id = 1;
+  double subtotal = 2;
+  string status = 3;
+  repeated string products = 4;
+  repeated string fieldsToUpdate = 5;
+}
+
+message DeleteRequest{
+  string _id = 1;
+}
