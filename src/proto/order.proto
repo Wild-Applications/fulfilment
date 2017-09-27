@@ -44,6 +44,7 @@ message CreateRequest {
   string premises = 3;
   string table = 4;
   repeated string products = 5;
+  string paymentTok = 6;
 }
 
 message CreateReply {

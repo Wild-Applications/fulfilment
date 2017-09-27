@@ -98,13 +98,34 @@ helper.get = function(call, callback){
 
 
 helper.create = function(call, callback){
-  //validation handled by database
-  var newOrder = new Order(call.request);
-  newOrder.save(function(err, result){
+  jwt.verify(call.metadata.get('authorization')[0], process.env.JWT_SECRET, function(err, token){
     if(err){
-      return callback({message:'err'},null);
+      return callback({message:JSON.stringify(err)},null);
     }
-    return callback(null, {_id: result._id.toString()});
+
+    //validation handled by database
+    var newOrder = new Order(call.request);
+    newOrder.save(function(err, result){
+      if(err){
+        return callback({message:'err'},null);
+      }
+      var grpc = require("grpc");
+      var paymentDescriptor = grpc.load(__dirname + '/../proto/payment.proto').payment;
+      var paymentClient = new paymentDescriptor.PaymentService('service.payment:1295', grpc.credentials.createInsecure());
+      console.log(JSON.stringify(result));
+      paymentClient.createPayment({subtotal:result.subtotal * 100, currency: 'gbp', premises: result.premises.toString()}, call.metadata, function(err, charges){
+        if(err){
+          result.remove(function(deleteError){
+            if(deleteError){
+              return callback({message:deleteError}, null);
+            }
+            return callback({message:"Unable to create order"},null);
+          })
+          return callback(err, null);
+        }
+        return callback(null, {_id: result._id.toString()});
+      })
+    });
   });
 }
 
