@@ -41,7 +41,7 @@ helper.getPending = function(call, callback){
       if(err){
         res.send(err);
       }else{
-        
+
         Order.find({
           $and: [
             {premises: result._id},
@@ -51,7 +51,7 @@ helper.getPending = function(call, callback){
           if(err){
             return callback({message:err.message,test:"test"}, null);
           }
-
+          console.log(resultOrdesr);
           var results = [];
           resultOrders.forEach(function(order){
             results[results.length] = formatOrder(order);
