@@ -42,7 +42,7 @@ helper.getPending = function(call, callback){
         res.send(err);
       }else{
 
-        Order.find({ $and: [{premises: result._id}, {status: { $in : ['PENDING', 'IN_PROGRESS']}]}).exec(function(err, resultOrders){
+        Order.find({ $and: [{premises: result._id}, {status: { $in : ['PENDING', 'IN_PROGRESS']}}]).exec(function(err, resultOrders){
           if(err){
             return callback({message:err.message,test:"test"}, null);
           }
