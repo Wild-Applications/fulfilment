@@ -42,7 +42,7 @@ server.addService(proto.order.FulfilmentService.service, {
   },
   getCompleted: function(call, callback){
     fulfilmentHelper.getCompleted(call,callback);
-  }
+  },
   get: function(call, callback){
     fulfilmentHelper.get(call, callback);
   },
