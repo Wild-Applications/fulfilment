@@ -51,7 +51,7 @@ helper.getPending = function(call, callback){
           if(err){
             return callback({message:err.message,test:"test"}, null);
           }
-          console.log(resultOrdesr);
+          console.log(resultOrders);
           var results = [];
           resultOrders.forEach(function(order){
             results[results.length] = formatOrder(order);
