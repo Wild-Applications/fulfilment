@@ -24,6 +24,7 @@ function formatOrder(order){
 }
 
 helper.getPending = function(call, callback){
+  return callback({message:'testing'}, null);
   //protected route so verify token;
   jwt.verify(call.metadata.get('authorization')[0], process.env.JWT_SECRET, function(err, token){
     if(err){
