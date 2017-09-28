@@ -27,6 +27,7 @@ helper.getPending = function(call, callback){
   //protected route so verify token;
   jwt.verify(call.metadata.get('authorization')[0], process.env.JWT_SECRET, function(err, token){
     if(err){
+      console.log('errored chcekding token')
       return callback({message:err},null);
     }
 
@@ -39,7 +40,8 @@ helper.getPending = function(call, callback){
 
     premisesClient.get({}, call.metadata, function(err, result){
       if(err){
-        res.send(err);
+        console.log('errored checking presmises');
+        return callback({message:err.message},null);
       }else{
 
         Order.find({
@@ -49,9 +51,9 @@ helper.getPending = function(call, callback){
           ]
         }).exec(function(err, resultOrders){
           if(err){
+            console.log('errored getting orders');
             return callback({message:err.message,test:"test"}, null);
           }
-          console.log(resultOrders);
           var results = [];
           resultOrders.forEach(function(order){
             results[results.length] = formatOrder(order);
