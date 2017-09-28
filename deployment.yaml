@@ -22,7 +22,7 @@ metadata:
   labels:
     app: fulfilment
 spec:
-  replicas: 2
+  replicas: 1
   template:
     metadata:
       labels:
@@ -30,7 +30,8 @@ spec:
     spec:
       containers:
       - name: fulfilment
-        image: wildapps/fulfilment:0.0.1
+        image: wildapplications/fulfilment:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 50051
         env:

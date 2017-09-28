@@ -23,7 +23,7 @@ function formatOrder(order){
   return formatted;
 }
 
-helper.getAll = function(call, callback){
+helper.getPending = function(call, callback){
   //protected route so verify token;
   jwt.verify(call.metadata.get('authorization')[0], process.env.JWT_SECRET, function(err, token){
     if(err){
@@ -41,7 +41,8 @@ helper.getAll = function(call, callback){
       if(err){
         res.send(err);
       }else{
-        Order.find({ premises: result._id }).exec(function(err, resultOrders){
+
+        Order.find({ $and: [{premises: result._id}, {status: { $in : ['PENDING', 'IN_PROGRESS']}]}).exec(function(err, resultOrders){
           if(err){
             return callback({message:err.message,test:"test"}, null);
           }

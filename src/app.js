@@ -37,8 +37,8 @@ process.on('SIGINT', function() {
 
 //define the callable methods that correspond to the methods defined in the protofile
 server.addService(proto.order.FulfilmentService.service, {
-  getAll: function(call, callback){
-    fulfilmentHelper.getAll(call, callback);
+  getPending: function(call, callback){
+    fulfilmentHelper.getPending(call, callback);
   },
   get: function(call, callback){
     fulfilmentHelper.get(call, callback);
