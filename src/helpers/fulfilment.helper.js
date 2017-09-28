@@ -27,7 +27,7 @@ helper.getPending = function(call, callback){
   //protected route so verify token;
   jwt.verify(call.metadata.get('authorization')[0], process.env.JWT_SECRET, function(err, token){
     if(err){
-      console.log('errored chcekding token')
+      console.log('errored chcekding token');
       return callback({message:err},null);
     }
 
@@ -40,7 +40,6 @@ helper.getPending = function(call, callback){
 
     premisesClient.get({}, call.metadata, function(err, result){
       if(err){
-        console.log('errored checking presmises');
         return callback({message:err.message},null);
       }else{
 
@@ -51,7 +50,6 @@ helper.getPending = function(call, callback){
           ]
         }).exec(function(err, resultOrders){
           if(err){
-            console.log('errored getting orders');
             return callback({message:err.message,test:"test"}, null);
           }
           var results = [];
@@ -61,7 +59,6 @@ helper.getPending = function(call, callback){
 
           getProducts(results, call.metadata).then(allData => {
             results = allData;
-            console.log('RESULTS ' + results.length);
             getTables(results, call.metadata).then(newAllData => {
               results = newAllData;
               return callback(null, results);
@@ -74,6 +71,55 @@ helper.getPending = function(call, callback){
     });
   });
 }
+
+helper.getCompleted = function(call, callback){
+  //protected route so verify token;
+  jwt.verify(call.metadata.get('authorization')[0], process.env.JWT_SECRET, function(err, token){
+    if(err){
+      return callback({message:err},null);
+    }
+
+    //we need to get the tokens premises
+    //to verify that we own this order therefore can make changes to it
+    var grpc = require("grpc");
+    var premisesDescriptor = grpc.load(__dirname + '/../proto/premises.proto').premises;
+    var premisesClient = new premisesDescriptor.PremisesService('service.premises:1295', grpc.credentials.createInsecure());
+
+
+    premisesClient.get({}, call.metadata, function(err, result){
+      if(err){
+        return callback({message:err.message},null);
+      }else{
+
+        Order.find({
+          $and: [
+            {premises: result._id},
+            {status: {$in: ['COMPLETE', 'CANCELLED']}}
+          ]
+        }).exec(function(err, resultOrders){
+          if(err){
+            return callback({message:err.message,test:"test"}, null);
+          }
+          var results = [];
+          resultOrders.forEach(function(order){
+            results[results.length] = formatOrder(order);
+          });
+
+          getProducts(results, call.metadata).then(allData => {
+            results = allData;
+            getTables(results, call.metadata).then(newAllData => {
+              results = newAllData;
+              return callback(null, results);
+            });
+          }, error => {
+            callback({message:error},null);
+          })
+        })
+      }
+    });
+  });
+}
+
 
 helper.get = function(call, callback){
   jwt.verify(call.metadata.get('authorization')[0], process.env.JWT_SECRET, function(err, token){

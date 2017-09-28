@@ -40,6 +40,9 @@ server.addService(proto.order.FulfilmentService.service, {
   getPending: function(call, callback){
     fulfilmentHelper.getPending(call, callback);
   },
+  getCompleted: function(call, callback){
+    fulfilmentHelper.getCompleted(call,callback);
+  }
   get: function(call, callback){
     fulfilmentHelper.get(call, callback);
   },

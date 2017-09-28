@@ -9,6 +9,7 @@ import './table.proto';
 //Methods exposed to client
 service FulfilmentService {
   rpc getPending (Empty) returns (GetAllReply){}
+  rpc getCompleted (Empty) returns (GetAllReply){}
   rpc get (GetRequest) returns (GetReply){}
   rpc create (CreateRequest) returns (CreateReply){}
   rpc update ( UpdateRequest ) returns (CreateReply){}
