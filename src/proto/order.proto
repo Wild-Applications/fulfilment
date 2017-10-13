@@ -14,6 +14,7 @@ service FulfilmentService {
   rpc create (CreateRequest) returns (CreateReply){}
   rpc update ( UpdateRequest ) returns (CreateReply){}
   rpc delete ( DeleteRequest ) returns (Empty){}
+  rpc capturePayment (CaptureRequest) returns (CaptureResponse){}
 }
 
 message Empty {
@@ -45,7 +46,8 @@ message CreateRequest {
   string premises = 3;
   string table = 4;
   repeated string products = 5;
-  string paymentTok = 6;
+  string source = 6;
+  bool storePaymentDetails = 7;
 }
 
 message CreateReply {
@@ -62,4 +64,12 @@ message UpdateRequest {
 
 message DeleteRequest{
   string _id = 1;
+}
+
+message CaptureRequest {
+  string order = 1;
+}
+
+message CaptureResponse {
+  bool captured = 1;
 }

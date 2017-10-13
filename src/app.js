@@ -54,6 +54,9 @@ server.addService(proto.order.FulfilmentService.service, {
   },
   delete: function(call, callback){
     fulfilmentHelper.delete(call, callback);
+  },
+  capturePayment: function(call, callback){
+    fulfilmentHelper.capture(call, callback);
   }
 
 });

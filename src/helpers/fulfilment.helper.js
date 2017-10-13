@@ -3,7 +3,18 @@
 var jwt = require('jsonwebtoken'),
 Order = require('../models/order.schema.js');
 
+var grpc = require("grpc");
+var paymentDescriptor = grpc.load(__dirname + '/../proto/payment.proto').payment;
+var paymentClient = new paymentDescriptor.PaymentService('service.payment:1295', grpc.credentials.createInsecure());
 
+var productDescriptor = grpc.load(__dirname + '/../proto/product.proto').product;
+var productClient = new productDescriptor.ProductService('service.product:1295', grpc.credentials.createInsecure());
+
+var premisesDescriptor = grpc.load(__dirname + '/../proto/premises.proto').premises;
+var premisesClient = new premisesDescriptor.PremisesService('service.premises:1295', grpc.credentials.createInsecure());
+
+var tableDescriptor = grpc.load(__dirname + '/../proto/table.proto').table;
+var tableClient = new tableDescriptor.TableService('service.table:1295', grpc.credentials.createInsecure());
 
 //var jwt = require('jsonwebtoken');
 //var tokenService = require('bleuapp-token-service').createTokenHandler('service.token', '50051');
@@ -33,9 +44,6 @@ helper.getPending = function(call, callback){
 
     //we need to get the tokens premises
     //to verify that we own this order therefore can make changes to it
-    var grpc = require("grpc");
-    var premisesDescriptor = grpc.load(__dirname + '/../proto/premises.proto').premises;
-    var premisesClient = new premisesDescriptor.PremisesService('service.premises:1295', grpc.credentials.createInsecure());
 
 
     premisesClient.get({}, call.metadata, function(err, result){
@@ -79,13 +87,6 @@ helper.getCompleted = function(call, callback){
       return callback({message:err},null);
     }
 
-    //we need to get the tokens premises
-    //to verify that we own this order therefore can make changes to it
-    var grpc = require("grpc");
-    var premisesDescriptor = grpc.load(__dirname + '/../proto/premises.proto').premises;
-    var premisesClient = new premisesDescriptor.PremisesService('service.premises:1295', grpc.credentials.createInsecure());
-
-
     premisesClient.get({}, call.metadata, function(err, result){
       if(err){
         return callback({message:err.message},null);
@@ -127,12 +128,6 @@ helper.get = function(call, callback){
       return callback({message:err},null);
     }
 
-    //we need to get the tokens premises
-    //to verify that we own this order therefore can make changes to it
-    var grpc = require("grpc");
-    var premisesDescriptor = grpc.load(__dirname + '/../proto/premises.proto').premises;
-    var premisesClient = new premisesDescriptor.PremisesService('service.premises:1295', grpc.credentials.createInsecure());
-
 
     premisesClient.get({}, call.metadata, function(err, result){
       if(err){
@@ -163,14 +158,21 @@ helper.create = function(call, callback){
       if(err){
         return callback({message:'err'},null);
       }
-      var grpc = require("grpc");
-      var paymentDescriptor = grpc.load(__dirname + '/../proto/payment.proto').payment;
-      var paymentClient = new paymentDescriptor.PaymentService('service.payment:1295', grpc.credentials.createInsecure());
-      console.log(JSON.stringify(result));
-      paymentClient.createPayment({subtotal:result.subtotal * 100, currency: 'gbp', premises: result.premises.toString()}, call.metadata, function(err, charges){
+      var order = {};
+      order.subtotal = result.subtotal * 100;
+      order.currency = 'gbp';
+      order.premises = result.premises.toString();
+      order.source = call.request.source;
+      order.order = result._id.toString();
+      order.storePaymentDetails = call.request.storePaymentDetails;
+
+      paymentClient.createPayment(order, call.metadata, function(err, charges){
         if(err){
+          console.log('err creating payment');
+          console.log(err);
           result.remove(function(deleteError){
             if(deleteError){
+              console.log('err removing order object');
               return callback({message:deleteError}, null);
             }
             return callback({message:"Unable to create order"},null);
@@ -183,17 +185,34 @@ helper.create = function(call, callback){
   });
 }
 
+helper.capture = function(call, callback){
+  console.log('got here');
+  jwt.verify(call.metadata.get('authorization')[0], process.env.JWT_SECRET, function(err, token){
+    console.log('here');
+    if(err){
+      return callback({message:JSON.stringify(err)},null);
+    }
+    Order.findOne({_id: call.request.order}, function(orderRetrievalError, order){
+      console.log('here now');
+      if(orderRetrievalError){
+        return callback({message:'failed to find the order and capture payment'}, null);
+      }
+      paymentClient.capturePayment({order: call.request.order}, call.metadata, function(err, response){
+        console.log('and here');
+        if(err){
+          return callback(err, null);
+        }
+        return callback(null, response);
+      })
+    })
+  });
+}
+
 helper.update = function(call, callback){
   jwt.verify(call.metadata.get('authorization')[0], process.env.JWT_SECRET, function(err, token){
     if(err){
       return callback({message:err},null);
     }
-
-    //we need to get the tokens premises
-    //to verify that we own this order therefore can make changes to it
-    var grpc = require("grpc");
-    var premisesDescriptor = grpc.load(__dirname + '/../proto/premises.proto').premises;
-    var premisesClient = new premisesDescriptor.PremisesService('service.premises:1295', grpc.credentials.createInsecure());
 
 
     premisesClient.get({}, call.metadata, function(err, result){
@@ -207,9 +226,6 @@ helper.update = function(call, callback){
           delete call.request._id;
           for(var key in call.request.fieldsToUpdate){
             if(call.request.fieldsToUpdate[key] != "_id"){
-              console.log("updating " + call.request.fieldsToUpdate[key]);
-              console.log("from " + order[call.request.fieldsToUpdate[key]]);
-              console.log("to " + call.request[call.request.fieldsToUpdate[key]]);
               order[call.request.fieldsToUpdate[key]] = call.request[call.request.fieldsToUpdate[key]];
             }
           }
@@ -240,10 +256,6 @@ helper.delete = function(call, callback){
 }
 
 function getProducts(orders, metadata){
-  var grpc = require("grpc");
-  var productDescriptor = grpc.load(__dirname + '/../proto/product.proto').product;
-  var productClient = new productDescriptor.ProductService('service.product:1295', grpc.credentials.createInsecure());
-
 
 
   var productsCall = function(order, metadata){
@@ -253,8 +265,6 @@ function getProducts(orders, metadata){
           if(err){return reject(err)}
           var resultProductArray = [];
           order.products.forEach(function(product){
-            console.log(product);
-            console.log(results);
             for(var i=0;i<results.products.length;i++){
               if(results.products[i]._id.toString() == product.toString()){
                 resultProductArray[resultProductArray.length] = results.products[i];
@@ -286,9 +296,6 @@ function getProducts(orders, metadata){
 }
 
 function getTables(orders, metadata){
-  var grpc = require("grpc");
-  var tableDescriptor = grpc.load(__dirname + '/../proto/table.proto').table;
-  var tableClient = new tableDescriptor.TableService('service.table:1295', grpc.credentials.createInsecure());
   console.log("requesting for " + orders.length);
   var tableCall = function(order, metadata){
     return new Promise(function(resolve, reject){
