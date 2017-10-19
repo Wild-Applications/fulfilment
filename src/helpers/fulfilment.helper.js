@@ -128,19 +128,27 @@ helper.get = function(call, callback){
       return callback({message:err},null);
     }
 
-
-    premisesClient.get({}, call.metadata, function(err, result){
-      if(err){
-        return callback(err, null);
-      }else{
-        Order.findOne({ $and: [{_id: call.request._id}, {premises: result._id}]}).exec(function(err, resultOrder){
-          if(err){
-            return callback({message:JSON.stringify(err)}, null);
-          }
-
-          return callback(null, formatOrder(resultOrder));
-        })
+    Order.find({owner: token.sub}, function(orderErr, resultOrders){
+      if(orderErr){
+        callback(orderErr, null);
       }
+      var results = [];
+      resultOrders.forEach(function(order){
+        results[results.length] = formatOrder(order);
+      });
+
+      getProducts(results, call.metadata).then(allData => {
+        results = allData;
+        getTables(results, call.metadata).then(newAllData => {
+          results = newAllData;
+          getPremises(results, call.metadata).then(premisesAllData => {
+            results = premisesAllData;
+            return callback(null, results);
+          });
+        });
+      }, error => {
+        callback({message:error},null);
+      })
     });
   });
 }
@@ -316,6 +324,28 @@ function getTables(orders, metadata){
 
   return Promise.all(requests);
 
+}
+
+function getPremises(orders, metadata){
+  console.log("requesting for " + orders.length);
+  var premisesCall = function(order, metadata){
+    return new Promise(function(resolve, reject){
+      premisesClient.getPremises({premisesId: order.premises}, metadata, function(err, result){
+        if(err){return reject(err)}
+        order.premises = result;
+        return resolve(order);
+      })
+    })
+  }
+
+  var requests = [];
+  orders.forEach(function(order){
+    requests[requests.length] = premisesCall(order, metadata);
+  })
+
+  //return requests;
+
+  return Promise.all(requests);
 }
 
 

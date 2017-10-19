@@ -8,9 +8,20 @@ service PremisesService {
   rpc create (CreateRequest) returns (CreateReply){}
   rpc update ( UpdateRequest ) returns (CreateReply){}
   rpc delete ( DeleteRequest ) returns (Empty){}
+  rpc getOwner (PremisesId) returns (OwnerId){}
+  rpc getFromOwner (ID) returns (GetReply){}
+  rpc getPremises(PremisesId) returns (GetReply){}
+}
+
+service GuestService {
+  rpc get (ID) returns (GetReply){}
 }
 
 message Empty {
+}
+
+message ID {
+  int32 _id = 1;
 }
 
 message GetReply {
@@ -37,4 +48,12 @@ message UpdateRequest {
 
 message DeleteRequest{
   string _id = 1;
+}
+
+message PremisesId{
+  string premisesId = 1;
+}
+
+message OwnerId {
+   int32 ownerId = 1;
 }
