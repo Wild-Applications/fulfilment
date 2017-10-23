@@ -11,7 +11,7 @@ import './table.proto';
 service FulfilmentService {
   rpc getPending (Empty) returns (GetAllReply){}
   rpc getCompleted (Empty) returns (GetAllReply){}
-  rpc get (GetRequest) returns (GetAllReply){}
+  rpc get (GetRequest) returns (GetAllInflatedReply){}
   rpc create (CreateRequest) returns (CreateReply){}
   rpc update ( UpdateRequest ) returns (CreateReply){}
   rpc delete ( DeleteRequest ) returns (Empty){}
@@ -36,6 +36,20 @@ message GetReply {
   string createdAt = 8;
 }
 
+message GetInflatedReply {
+  string _id = 1;
+  double subtotal = 2;
+  repeated product.GetReply products = 3;
+  table.GetReply table = 4;
+  string premises = 5;
+  string status = 6;
+  int32 owner = 7;
+  string createdAt = 8;
+}
+
+message GetAllInflatedReply {
+  repeated GetInflatedReply orders = 1;
+}
 
 message GetAllReply {
   repeated GetReply orders = 1;

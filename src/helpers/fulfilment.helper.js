@@ -1,7 +1,8 @@
 
 //imports
 var jwt = require('jsonwebtoken'),
-Order = require('../models/order.schema.js');
+Order = require('../models/order.schema.js'),
+errors = require('../errors/errors.json');
 
 var grpc = require("grpc");
 var paymentDescriptor = grpc.load(__dirname + '/../proto/payment.proto').payment;
@@ -38,7 +39,6 @@ helper.getPending = function(call, callback){
   //protected route so verify token;
   jwt.verify(call.metadata.get('authorization')[0], process.env.JWT_SECRET, function(err, token){
     if(err){
-      console.log('errored chcekding token');
       return callback({message:err},null);
     }
 
@@ -48,7 +48,7 @@ helper.getPending = function(call, callback){
 
     premisesClient.get({}, call.metadata, function(err, result){
       if(err){
-        return callback({message:err.message},null);
+        return callback({message:err},null);
       }else{
 
         Order.find({
@@ -58,7 +58,7 @@ helper.getPending = function(call, callback){
           ]
         }).exec(function(err, resultOrders){
           if(err){
-            return callback({message:err.message,test:"test"}, null);
+            return callback({message:JSON.stringify({code:'04000001', error:errors['0001']})}, null);
           }
           var results = [];
           resultOrders.forEach(function(order){
@@ -72,7 +72,7 @@ helper.getPending = function(call, callback){
               return callback(null, results);
             });
           }, error => {
-            callback({message:error},null);
+            return callback({message:JSON.stringify({code:'04000002', error:errors['0002']})}, null);
           })
         })
       }
@@ -89,7 +89,7 @@ helper.getCompleted = function(call, callback){
 
     premisesClient.get({}, call.metadata, function(err, result){
       if(err){
-        return callback({message:err.message},null);
+        return callback({message:err},null);
       }else{
 
         Order.find({
@@ -99,7 +99,7 @@ helper.getCompleted = function(call, callback){
           ]
         }).exec(function(err, resultOrders){
           if(err){
-            return callback({message:err.message,test:"test"}, null);
+            return callback({message:JSON.stringify({code:'04010001', error:errors['0001']})}, null);
           }
           var results = [];
           resultOrders.forEach(function(order){
@@ -113,7 +113,7 @@ helper.getCompleted = function(call, callback){
               return callback(null, results);
             });
           }, error => {
-            callback({message:error},null);
+            return callback({message:JSON.stringify({code:'04010002', error:errors['0002']})}, null);
           })
         })
       }
@@ -130,7 +130,7 @@ helper.get = function(call, callback){
 
     Order.find({owner: token.sub}, function(orderErr, resultOrders){
       if(orderErr){
-        callback(orderErr, null);
+        return callback({message:JSON.stringify({code:'04020001', error:errors['0001']})}, null);
       }
       var results = [];
       resultOrders.forEach(function(order){
@@ -147,7 +147,7 @@ helper.get = function(call, callback){
           });
         });
       }, error => {
-        callback({message:error},null);
+        return callback({message:JSON.stringify({code:'04020002', error:errors['0002']})}, null);
       })
     });
   });
@@ -157,14 +157,14 @@ helper.get = function(call, callback){
 helper.create = function(call, callback){
   jwt.verify(call.metadata.get('authorization')[0], process.env.JWT_SECRET, function(err, token){
     if(err){
-      return callback({message:JSON.stringify(err)},null);
+      return callback({message:err},null);
     }
 
     //validation handled by database
     var newOrder = new Order(call.request);
     newOrder.save(function(err, result){
       if(err){
-        return callback({message:'err'},null);
+        return callback({message:JSON.stringify({code:'04000003', error:errors['0003']})},null);
       }
       var order = {};
       order.subtotal = result.subtotal * 100;
@@ -176,16 +176,13 @@ helper.create = function(call, callback){
 
       paymentClient.createPayment(order, call.metadata, function(err, charges){
         if(err){
-          console.log('err creating payment');
-          console.log(err);
           result.remove(function(deleteError){
             if(deleteError){
-              console.log('err removing order object');
-              return callback({message:deleteError}, null);
+              return callback({message:JSON.stringify({code:'04010003', error:errors['0003']})}, null);
+            }else{
+              return callback(err,null);
             }
-            return callback({message:"Unable to create order"},null);
           })
-          return callback(err, null);
         }
         return callback(null, {_id: result._id.toString()});
       })
@@ -194,19 +191,15 @@ helper.create = function(call, callback){
 }
 
 helper.capture = function(call, callback){
-  console.log('got here');
   jwt.verify(call.metadata.get('authorization')[0], process.env.JWT_SECRET, function(err, token){
-    console.log('here');
     if(err){
-      return callback({message:JSON.stringify(err)},null);
+      return callback({message:err},null);
     }
     Order.findOne({_id: call.request.order}, function(orderRetrievalError, order){
-      console.log('here now');
       if(orderRetrievalError){
-        return callback({message:'failed to find the order and capture payment'}, null);
+        return callback({message:JSON.stringify({code:'04000004', error:errors['0004']})}, null);
       }
       paymentClient.capturePayment({order: call.request.order}, call.metadata, function(err, response){
-        console.log('and here');
         if(err){
           return callback(err, null);
         }
@@ -225,11 +218,11 @@ helper.update = function(call, callback){
 
     premisesClient.get({}, call.metadata, function(err, result){
       if(err){
-        res.send(err);
+        return callback(err, null);
       }else{
         Order.findOne({ $and: [{_id: call.request._id}, {premises: result._id}]}, function(err, order){
           if(err){
-            return callback({message:err}, null);
+            return callback({message:JSON.stringify({code:'04030001', error:errors['0001']})}, null);
           }
           delete call.request._id;
           for(var key in call.request.fieldsToUpdate){

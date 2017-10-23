@@ -1,0 +1,6 @@
+{
+  "0001": {"message": "Unable to retrieve order from database", "status": 500},
+  "0002": {"message": "Unable to populate products within order", "status": 500},
+  "0003": {"message": "Unable to create new order", "status": 500},
+  "0004": {"message": "Failed to capture payment", "status": 500}
+}
