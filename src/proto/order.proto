@@ -25,7 +25,7 @@ message GetRequest {
   string _id = 1;
 }
 
-message GetReply {
+message GetInflatedReply {
   string _id = 1;
   double subtotal = 2;
   repeated product.GetReply products = 3;
@@ -36,7 +36,7 @@ message GetReply {
   string createdAt = 8;
 }
 
-message GetInflatedReply {
+message GetReply {
   string _id = 1;
   double subtotal = 2;
   repeated product.GetReply products = 3;
