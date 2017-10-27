@@ -2,7 +2,6 @@ syntax = "proto3";
 //this belongs to this microservice
 package product;
 
-import "google/protobuf/struct.proto";
 
 //Methods exposed to client
 service ProductService {
