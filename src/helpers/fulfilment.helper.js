@@ -138,7 +138,7 @@ helper.getCompletedByDay = function(call, callback){
           $and:[
             {premises: result._id},
             {status: {$in: ['COMPLETE', 'CANCELLED']}},
-            {createdAt: { $lt: new Date(call.request.year+','+call.request.month+','+call.request.day), $gt: new Date(call.request.year+','+call.request.month+','+(call.request.day+1)) }}
+            {createdAt: { $lt: new Date(call.request.year+','+call.request.month+','+call.request.day), $gt: new Date(call.request.year+','+call.request.month+','+(parseInt(call.request.day)+1)) }}
           ]
         }).exec(function(err, resultOrders){
           if(err){
