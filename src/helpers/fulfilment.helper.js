@@ -132,6 +132,7 @@ helper.getCompletedByDay = function(call, callback){
       if(err){
         return callback({message:err},null);
       }else{
+        console.log(new Date(call.request.year+','+call.request.month+','+call.request.day+',23,59,59,999'));
         Order.find({
           $and:[
             {premises: result._id},
