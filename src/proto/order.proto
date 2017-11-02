@@ -12,6 +12,7 @@ service FulfilmentService {
   rpc getPending (Empty) returns (GetAllReply){}
   rpc getCompleted (Empty) returns (GetAllReply){}
   rpc getCompletedByDay (GetByDayRequest) returns (GetAllReply){}
+  rpc getOrderBreakdown (Empty) returns (OrderBreakdownReply){}
   rpc get (GetRequest) returns (GetAllInflatedReply){}
   rpc create (CreateRequest) returns (CreateReply){}
   rpc update ( UpdateRequest ) returns (CreateReply){}
@@ -31,6 +32,12 @@ message GetByDayRequest {
   string month = 3;
   string year = 4;
 }
+
+message OrderBreakdownReply {
+
+}
+
+
 
 message GetInflatedReply {
   string _id = 1;

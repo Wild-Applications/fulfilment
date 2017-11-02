@@ -46,6 +46,9 @@ server.addService(proto.order.FulfilmentService.service, {
   getCompletedByDay: function(call, callback){
     fulfilmentHelper.getCompletedByDay(call, callback);
   },
+  getOrderBreakdown: function(call, callback){
+    fulfilmentHelper.getOrderBreakdown(call, callback);
+  }
   get: function(call, callback){
     fulfilmentHelper.get(call, callback);
   },

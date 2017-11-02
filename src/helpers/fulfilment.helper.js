@@ -165,6 +165,37 @@ helper.getCompletedByDay = function(call, callback){
   });
 }
 
+helper.getOrderBreakdown = function(call, callback){
+  jwt.verify(call.metadata.get('authorization')[0], process.env.JWT_SECRET, function(err, token){
+    if(err){
+      return callback({message:err},null);
+    }
+
+    premisesClient.get({}, call.metadata, function(err, result){
+      if(err){
+        return callback({message:err},null);
+      }else{
+        //aggregate orders based on premises match and day
+
+        Order.aggregate([
+          { $match: { $and: [
+            {premises: result._id},
+            {status: {$in: ['COMPLETE', 'CANCELLED']}}
+          ]}},
+          { $group: {_id : { month: { $month: "$createdAt" }, day: { $dayOfMonth: "$createdAt" }, year: { $year: "$createdAt" } },
+                      count: {$sum: 1}}}
+        ]).exec(function(err, orders){
+          if(err){
+            return callback({message:JSON.stringify({code:'04040001', error:errors['0001']})}, null);
+          }
+          console.log(orders);
+          return callback(null, orders);
+        })
+      }
+    });
+  });
+}
+
 
 helper.get = function(call, callback){
   jwt.verify(call.metadata.get('authorization')[0], process.env.JWT_SECRET, function(err, token){
