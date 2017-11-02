@@ -11,6 +11,7 @@ import './table.proto';
 service FulfilmentService {
   rpc getPending (Empty) returns (GetAllReply){}
   rpc getCompleted (Empty) returns (GetAllReply){}
+  rpc getCompletedByDay (GetByDayRequest) returns (GetAllReply){}
   rpc get (GetRequest) returns (GetAllInflatedReply){}
   rpc create (CreateRequest) returns (CreateReply){}
   rpc update ( UpdateRequest ) returns (CreateReply){}
@@ -23,6 +24,13 @@ message Empty {
 
 message GetRequest {
   string _id = 1;
+}
+
+message GetByDayRequest {
+  string _id = 1;
+  string day = 2;
+  string month = 3;
+  string year = 4;
 }
 
 message GetInflatedReply {

@@ -121,6 +121,48 @@ helper.getCompleted = function(call, callback){
   });
 }
 
+helper.getCompletedByDay = function(call, callback){
+  //protected route so verify token;
+  jwt.verify(call.metadata.get('authorization')[0], process.env.JWT_SECRET, function(err, token){
+    if(err){
+      return callback({message:err},null);
+    }
+
+    premisesClient.get({}, call.metadata, function(err, result){
+      if(err){
+        return callback({message:err},null);
+      }else{
+        Order.find({
+          $and:[
+            {premises: result._id},
+            {status: {$in: ['COMPLETE', 'CANCELLED']}},
+            {createdAt: { $lt: new Date(call.year+','+call.month+','+call.day), $gt: new Date(year+','+month+','+(day+1)) }}
+          ]
+        }).exec(function(err, resultOrders){
+          if(err){
+            return callback({message:JSON.stringify({code:'04010001', error:errors['0001']})}, null);
+          }
+
+          var results = [];
+          resultOrders.forEach(function(order){
+            results[results.length] = formatOrder(order);
+          });
+
+          getProducts(results, call.metadata).then(allData => {
+            results = allData;
+            getTables(results, call.metadata).then(newAllData => {
+              results = newAllData;
+              return callback(null, results);
+            });
+          }, error => {
+            return callback({message:JSON.stringify({code:'04010002', error:errors['0002']})}, null);
+          })
+        });
+      }
+    });
+  });
+}
+
 
 helper.get = function(call, callback){
   jwt.verify(call.metadata.get('authorization')[0], process.env.JWT_SECRET, function(err, token){
