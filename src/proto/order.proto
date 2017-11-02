@@ -27,7 +27,6 @@ message GetRequest {
 }
 
 message GetByDayRequest {
-  string _id = 1;
   string day = 2;
   string month = 3;
   string year = 4;
