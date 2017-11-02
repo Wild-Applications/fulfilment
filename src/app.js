@@ -48,7 +48,7 @@ server.addService(proto.order.FulfilmentService.service, {
   },
   getOrderBreakdown: function(call, callback){
     fulfilmentHelper.getOrderBreakdown(call, callback);
-  }
+  },
   get: function(call, callback){
     fulfilmentHelper.get(call, callback);
   },
