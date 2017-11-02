@@ -132,13 +132,11 @@ helper.getCompletedByDay = function(call, callback){
       if(err){
         return callback({message:err},null);
       }else{
-        console.log(new Date(call.request.year+','+call.request.month+','+call.request.day));
-        console.log(new Date(call.request.year+','+call.request.month+','+(call.request.day+1)));
         Order.find({
           $and:[
             {premises: result._id},
             {status: {$in: ['COMPLETE', 'CANCELLED']}},
-            {createdAt: { $lt: new Date(call.request.year+','+call.request.month+','+call.request.day), $gt: new Date(call.request.year+','+call.request.month+','+(parseInt(call.request.day)+1)) }}
+            {createdAt: { $gte: new Date(call.request.year+','+call.request.month+','+call.request.day), $lt: new Date(call.request.year+','+call.request.month+','+(parseInt(call.request.day)+1)) }}
           ]
         }).exec(function(err, resultOrders){
           if(err){
