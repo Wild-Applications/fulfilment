@@ -181,9 +181,7 @@ helper.getOrderBreakdown = function(call, callback){
           { $match: { $and: [
             {premises: result._id},
             {status: {$in: ['COMPLETE', 'CANCELLED']}}
-          ]}},
-          { $group: {_id : { month: { $month: "$createdAt" }, day: { $dayOfMonth: "$createdAt" }, year: { $year: "$createdAt" } },
-                      count: {$sum: 1}}}
+          ]}}
         ]).exec(function(err, orders){
           if(err){
             return callback({message:JSON.stringify({code:'04040001', error:errors['0001']})}, null);
