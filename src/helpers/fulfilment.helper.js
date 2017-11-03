@@ -190,7 +190,7 @@ helper.getOrderBreakdown = function(call, callback){
           },
           {
             $sort: {
-              createdAt: 1
+              "_id.day": 1
             }
           }
         ]).exec(function(err, orders){
