@@ -187,6 +187,11 @@ helper.getOrderBreakdown = function(call, callback){
               _id: {month: {$month: "$createdAt"}, day: {$dayOfMonth: "$createdAt"}, year: {$year: "$createdAt"}},
               count: { $sum: 1 }
             }
+          },
+          {
+            $sort: {
+              _id.month: 1
+            }
           }
         ]).exec(function(err, orders){
           if(err){
