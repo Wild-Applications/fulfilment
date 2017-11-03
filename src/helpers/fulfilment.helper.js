@@ -2,7 +2,8 @@
 //imports
 var jwt = require('jsonwebtoken'),
 Order = require('../models/order.schema.js'),
-errors = require('../errors/errors.json');
+errors = require('../errors/errors.json'),
+mongoose = require('mongoose');;
 
 var grpc = require("grpc");
 var paymentDescriptor = grpc.load(__dirname + '/../proto/payment.proto').payment;
@@ -179,7 +180,7 @@ helper.getOrderBreakdown = function(call, callback){
         Order.aggregate([
           { $match: { $and: [
             {status: {$in: ['COMPLETE', 'CANCELLED']}},
-            {premises: result._id.toString()}
+            {premises: mongoose.Types.ObjectId(result._id.toString())}
           ]}}
         ]).exec(function(err, orders){
           if(err){
