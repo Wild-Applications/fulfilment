@@ -34,9 +34,15 @@ message GetByDayRequest {
 }
 
 message OrderBreakdownReply {
-
+  breakdownReply _id = 1;
+  int32 count = 2;
 }
 
+message breakdownReply {
+  int32 month = 1;
+  int32 day = 2;
+  int32 year = 3;
+}
 
 
 message GetInflatedReply {
