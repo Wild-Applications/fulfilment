@@ -178,7 +178,7 @@ helper.getOrderBreakdown = function(call, callback){
         //aggregate orders based on premises match and day
 
         Order.aggregate([
-          { $match: { $and: [
+          { $match: { $and:[
             {premises: result._id},
             {status: {$in: ['COMPLETE', 'CANCELLED']}}
           ]}}
