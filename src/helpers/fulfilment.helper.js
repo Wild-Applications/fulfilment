@@ -192,6 +192,7 @@ helper.getOrderBreakdown = function(call, callback){
           if(err){
             return callback({message:JSON.stringify({code:'04040001', error:errors['0001']})}, null);
           }
+          console.log(orders);
           return callback(null, orders);
         })
       }
