@@ -45,7 +45,7 @@ message breakdownReply {
 }
 
 message OrderBreakdownReplyArray{
-  repeated breakdownReply breakdown = 1;
+  repeated OrderBreakdownReply breakdown = 1;
 }
 
 message GetInflatedReply {
