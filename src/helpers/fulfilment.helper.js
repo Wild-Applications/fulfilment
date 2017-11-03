@@ -179,8 +179,7 @@ helper.getOrderBreakdown = function(call, callback){
 
         Order.aggregate([
           { $match: { $and:[
-            {premises: result._id},
-            {status: {$in: ['COMPLETE', 'CANCELLED']}}
+            {premises: result._id}
           ]}}
         ]).exec(function(err, orders){
           if(err){
