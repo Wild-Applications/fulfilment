@@ -202,13 +202,6 @@ helper.getOrderBreakdown = function(call, callback){
         })
       }
     });
-  });
-
-  console.log("Testing transaction");
-  paymentClient.createSubscriptionCharge({_id: 1, fee: 20000}, function(err, response){
-    console.log(err);
-    console.log(response);
-  });
 }
 
 
