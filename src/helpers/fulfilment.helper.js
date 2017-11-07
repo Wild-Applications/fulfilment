@@ -190,7 +190,7 @@ helper.getOrderBreakdown = function(call, callback){
           },
           {
             $sort: {
-              "_id.day": 1, "_id.month": 1, "_id.year": 1 
+              "_id.day": 1, "_id.month": 1, "_id.year": 1
             }
           }
         ]).exec(function(err, orders){
@@ -202,6 +202,12 @@ helper.getOrderBreakdown = function(call, callback){
         })
       }
     });
+  });
+
+  console.log("Testing transaction");
+  paymentClient.createSubscriptionCharge({_id: 1, fee: 20000}, function(err, response){
+    console.log(err);
+    console.log(response);
   });
 }
 
