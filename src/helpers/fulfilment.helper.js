@@ -202,6 +202,7 @@ helper.getOrderBreakdown = function(call, callback){
         })
       }
     });
+  })
 }
 
 
