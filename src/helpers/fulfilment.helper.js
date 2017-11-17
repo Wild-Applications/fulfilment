@@ -345,9 +345,10 @@ helper.cancel = function(call, callback){
     if(err){
       return callback({name:'04000005', message:errors['0005']},null);
     }
-
+    console.log('got here');
     premisesClient.get({}, call.metadata, function(err, premises){
       if(err){
+        console.log("premises err ", err);
         return callback({name: '04010006', message:errors['0006']},null);
       }else{
         Order.findOne({ $and: [
@@ -355,6 +356,7 @@ helper.cancel = function(call, callback){
           {owner: premises._id}
         ]}, (err, order) => {
           if(err){
+            console.log("order err ", err);
             return callback({name: '04000006', message:errors['0006']}, null);
           }
           if(order){
