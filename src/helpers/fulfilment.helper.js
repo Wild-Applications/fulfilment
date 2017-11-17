@@ -353,7 +353,7 @@ helper.cancel = function(call, callback){
       }else{
         Order.findOne({ $and: [
           {_id: call.request._id},
-          {owner: premises._id}
+          {premises: premises._id}
         ]}, (err, order) => {
           if(err){
             console.log("order err ", err);
