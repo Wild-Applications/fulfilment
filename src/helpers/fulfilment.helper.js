@@ -345,23 +345,32 @@ helper.cancel = function(call, callback){
     if(err){
       return callback({name:'04000005', message:errors['0005']},null);
     }
-    Order.findOne({ $and: [
-      {_id: call.request._id},
-      {owner: token.sub}
-    ]}, (err, order) => {
+
+    premisesClient.get({}, call.metadata, function(err, premises){
       if(err){
-        return callback({name: '04000006', message:errors['0006']}, null);
-      }
-      if(order){
-        order.status = "CANCELLED";
-        order.save((err) => {
+        return callback({name: '04010006', message:errors['0006']},null);
+      }else{
+        Order.findOne({ $and: [
+          {_id: call.request._id},
+          {owner: premises._id}
+        ]}, (err, order) => {
           if(err){
-            return callback({name:'04000007', message:errors['0007']}, null);
+            return callback({name: '04000006', message:errors['0006']}, null);
           }
-          return callback(null,{});
-        });
+          if(order){
+            order.status = "CANCELLED";
+            order.save((err) => {
+              if(err){
+                return callback({name:'04000007', message:errors['0007']}, null);
+              }
+              return callback(null,{});
+            });
+          }else{
+            console.log('no order found');
+          }
+        })
       }
-    })
+    });
   });
 }
 
