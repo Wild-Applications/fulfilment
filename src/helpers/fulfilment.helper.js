@@ -340,6 +340,31 @@ helper.delete = function(call, callback){
   });
 }
 
+helper.cancel = function(call, callback){
+  jwt.verify(call.metadata.get('authorization')[0], process.env.JWT_SECRET, function(err, token){
+    if(err){
+      return callback({name:'04000005', message:errors['0005']},null);
+    }
+    Order.findOne({ $and: [
+      {_id: call.request._id},
+      {owner: token.sub}
+    ]}, (err, order) => {
+      if(err){
+        return callback({name: '04000006', message:errors['0006']}, null);
+      }
+      if(order){
+        order.status = "CANCELLED";
+        order.save((err) => {
+          if(err){
+            return callback({name:'04000007', message:errors['0007']}, null);
+          }
+          return callback(null,{});
+        });
+      }
+    })
+  });
+}
+
 function getProducts(orders, metadata){
 
 

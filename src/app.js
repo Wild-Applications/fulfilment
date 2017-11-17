@@ -63,6 +63,9 @@ server.addService(proto.order.FulfilmentService.service, {
   },
   capturePayment: function(call, callback){
     fulfilmentHelper.capture(call, callback);
+  },
+  cancel: function(call, callback){
+    fulfilmentHelper.cancel(call,callback);
   }
 
 });
