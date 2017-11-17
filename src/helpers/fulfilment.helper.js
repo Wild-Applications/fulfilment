@@ -360,7 +360,7 @@ helper.cancel = function(call, callback){
             return callback({name: '04000006', message:errors['0006']}, null);
           }
           if(order){
-            paymentClient.refundPayment({order:order._id}, call.metadata, (err, result) => {
+            paymentClient.refundPayment({order:order._id.toString()}, call.metadata, (err, result) => {
               if(err){
                 return callback({name: '04000008', message:errors['0008']}, null);
               }
