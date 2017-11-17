@@ -360,15 +360,20 @@ helper.cancel = function(call, callback){
             return callback({name: '04000006', message:errors['0006']}, null);
           }
           if(order){
-            order.status = "CANCELLED";
-            order.save((err) => {
+            paymentClient.refundPayment({order:order._id}, call.metadata, (err, result) => {
               if(err){
-                return callback({name:'04000007', message:errors['0007']}, null);
+                return callback({name: '04000008', message:errors['0008']}, null);
               }
-              return callback(null,{});
-            });
+              order.status = "CANCELLED";
+              order.save((err) => {
+                if(err){
+                  return callback({name:'04000007', message:errors['0007']}, null);
+                }
+                return callback(null,{});
+              });
+            })
           }else{
-            console.log('no order found');
+            return callback({name:'04020006', message:errors['0006']}, null);
           }
         })
       }
