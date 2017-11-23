@@ -6,10 +6,7 @@ const fulfilmentHelper = require('./helpers/fulfilment.helper.js');
 const proto = grpc.load(__dirname + '/proto/order.proto');
 const server = new grpc.Server();
 const mongoose = require('mongoose');
-const dbUrl = "mongodb://wildappsadminmworder:pcNb2TNR47d3m7vA@ordercluster-shard-00-00-ekvf8.mongodb.net:27017,ordercluster-shard-00-01-ekvf8.mongodb.net:27017,ordercluster-shard-00-02-ekvf8.mongodb.net:27017/ORDERS?ssl=true&replicaSet=OrderCluster-shard-0&authSource=admin";
-const dbUrlTest = "mongodb://" + process.env.DB_USER + ":" + process.env.DB_PASS + "@" + process.env.DB_HOST;
-console.log(dbUrlTest);
-console.log(dbUrlTest == dbUrl);
+const dbUrl = "mongodb://" + process.env.DB_USER + ":" + process.env.DB_PASS + "@" + process.env.DB_HOST;
 mongoose.connect(dbUrl);
 
 // CONNECTION EVENTS
