@@ -293,6 +293,8 @@ helper.complete = function(call, callback){
         }else{
           order.status = "COMPLETE";
         }
+
+          console.log('response ',response);
         order.save((err) => {
           console.log('save err', err);
           if(err){
