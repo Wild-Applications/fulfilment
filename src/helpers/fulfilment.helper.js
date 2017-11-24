@@ -285,7 +285,7 @@ helper.complete = function(call, callback){
       }
       paymentClient.capturePayment({order: call.request.order}, call.metadata, function(paymentErr, response){
         if(paymentErr){
-          return callback(err, null);
+          return callback(paymentErr, null);
         }
         console.log('response', response);
         if(response && response.captured == false){
