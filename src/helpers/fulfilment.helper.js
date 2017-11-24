@@ -381,6 +381,30 @@ helper.cancel = function(call, callback){
   });
 }
 
+helper.wasRefunded = (call, callback) => {
+  if(call.request.charge_id){
+    paymentClient.wasRefunded({charge_id: call.request.charge_id}, (error, response) => {
+      if(err){
+        return callback(err, null);
+      }
+      Order.findOne({_id: response.order_id}, (err, order) => {
+        if(err){
+          return callback({message:errors['0001'], name: '04060001'}, null);
+        }
+        order.status = 'REFUNDED';
+        order.save((err) => {
+          if(err){
+            return callback({message: errors['0010'], name:'04000010'}, null);
+          }
+          return callback(null, {acknowledged: true});
+        })
+      });
+    });
+  }else{
+    return callback({message: errors['0009'], name: '04000009'}, null);
+  }
+}
+
 function getProducts(orders, metadata){
 
 
