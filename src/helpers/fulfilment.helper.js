@@ -287,7 +287,14 @@ helper.capture = function(call, callback){
         if(err){
           return callback(err, null);
         }
-        return callback(null, response);
+        order.status = "COMPLETE";
+        order.save((err) => {
+          if(err){
+            return callback(null, response);
+          }else{
+            return callback(null, response);
+          }
+        });
       })
     })
   });
