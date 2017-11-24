@@ -287,6 +287,7 @@ helper.complete = function(call, callback){
         if(paymentErr){
           return callback(err, null);
         }
+        console.log('response', response);
         if(response && response.captured == false){
           order.status = "REFUNDED";
         }else{
