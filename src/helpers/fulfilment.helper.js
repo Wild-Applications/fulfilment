@@ -274,7 +274,7 @@ helper.create = function(call, callback){
   });
 }
 
-helper.capture = function(call, callback){
+helper.complete = function(call, callback){
   jwt.verify(call.metadata.get('authorization')[0], process.env.JWT_SECRET, function(err, token){
     if(err){
       return callback({message:err},null);
@@ -283,9 +283,20 @@ helper.capture = function(call, callback){
       if(orderRetrievalError){
         return callback({message:JSON.stringify({code:'04000004', error:errors['0004']})}, null);
       }
-      paymentClient.capturePayment({order: call.request.order}, call.metadata, function(err, response){
-        if(err){
-          return callback(err, null);
+      paymentClient.capturePayment({order: call.request.order}, call.metadata, function(paymentErr, response){
+        if(paymentErr){
+          if(response && response.captured == false){
+            //we can assume the payment has been refunded
+            order.status = "REFUNDED";
+            order.save((err) => {
+              if(err){
+                return callback({message:errors['0010'], code:'04010010'},null);
+              }
+              return callback(paymentErr,null);
+            });
+          }else{
+            return callback(err, null);
+          }
         }
         order.status = "COMPLETE";
         order.save((err) => {

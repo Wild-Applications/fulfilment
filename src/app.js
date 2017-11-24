@@ -60,8 +60,8 @@ server.addService(proto.order.FulfilmentService.service, {
   delete: function(call, callback){
     fulfilmentHelper.delete(call, callback);
   },
-  capturePayment: function(call, callback){
-    fulfilmentHelper.capture(call, callback);
+  complete: function(call, callback){
+    fulfilmentHelper.complete(call, callback);
   },
   cancel: function(call, callback){
     fulfilmentHelper.cancel(call,callback);

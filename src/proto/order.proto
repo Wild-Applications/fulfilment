@@ -18,7 +18,7 @@ service FulfilmentService {
   rpc update ( UpdateRequest ) returns (CreateReply){}
   rpc delete ( DeleteRequest ) returns (Empty){}
   rpc cancel ( DeleteRequest ) returns (Empty){}
-  rpc capturePayment (CaptureRequest) returns (CaptureResponse){}
+  rpc complete (CaptureRequest) returns (CaptureResponse){}
   rpc wasRefunded (ForcedRefund) returns (ForcedRefundResponse){}
 }
 
