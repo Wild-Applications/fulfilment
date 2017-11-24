@@ -384,7 +384,7 @@ helper.cancel = function(call, callback){
 helper.wasRefunded = (call, callback) => {
   if(call.request.charge_id){
     paymentClient.wasRefunded({charge_id: call.request.charge_id}, (error, response) => {
-      if(err){
+      if(error){
         return callback(err, null);
       }
       Order.findOne({_id: response.order_id}, (err, order) => {
