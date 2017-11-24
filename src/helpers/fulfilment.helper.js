@@ -285,21 +285,13 @@ helper.complete = function(call, callback){
       }
       paymentClient.capturePayment({order: call.request.order}, call.metadata, function(paymentErr, response){
         if(paymentErr){
-          console.log('payment err', paymentErr);
-          if(response && response.captured == false){
-            //we can assume the payment has been refunded
-            order.status = "REFUNDED";
-            order.save((err) => {
-              if(err){
-                return callback({message:errors['0010'], code:'04010010'},null);
-              }
-              return callback(paymentErr,null);
-            });
-          }else{
-            return callback(err, null);
-          }
+          return callback(err, null);
         }
-        order.status = "COMPLETE";
+        if(response && response.captured == false){
+          order.status = "REFUNDED";
+        }else{
+          order.status = "COMPLETE";
+        }
         order.save((err) => {
           console.log('save err', err);
           if(err){
