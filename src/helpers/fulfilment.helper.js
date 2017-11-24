@@ -96,7 +96,7 @@ helper.getCompleted = function(call, callback){
         Order.find({
           $and: [
             {premises: result._id},
-            {status: {$in: ['COMPLETE', 'CANCELLED']}}
+            {status: {$in: ['COMPLETE', 'CANCELLED', 'REFUNDED']}}
           ]
         }).exec(function(err, resultOrders){
           if(err){
