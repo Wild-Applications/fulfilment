@@ -66,7 +66,7 @@ server.addService(proto.order.FulfilmentService.service, {
   cancel: function(call, callback){
     fulfilmentHelper.cancel(call,callback);
   },
-  wasRefunded: (call, callback){
+  wasRefunded: (call, callback) => {
     fulfilmentHelper.wasRefunded(call, callback);
   }
 
