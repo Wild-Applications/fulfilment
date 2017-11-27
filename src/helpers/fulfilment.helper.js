@@ -298,7 +298,7 @@ helper.complete = function(call, callback){
           if(response.captured){
             return callback(null,response);
           }else{
-            return callback({message:errors[0011], code:'04000011'},null);
+            return callback({message:errors['0011'], code:'04000011'},null);
           }
         });
       })
