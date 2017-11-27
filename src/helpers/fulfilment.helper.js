@@ -3,7 +3,6 @@
 var jwt = require('jsonwebtoken'),
 Order = require('../models/order.schema.js'),
 errors = require('../errors/errors.json'),
-errorHelper = require('./error.helper.js'),
 mongoose = require('mongoose');;
 
 var grpc = require("grpc");
@@ -300,7 +299,11 @@ helper.complete = function(call, callback){
             return callback(null,response);
           }else{
             console.log(errors['0011']);
-            return callback(errorHelper.construct('0011', '00'),null);
+            var metadata = new grpc.Metadata();
+            metadata.add('error_code', '04000011');
+            var error = errors['0011'];
+            error.metadata = metadata;
+            return callback(error,null);
           }
         });
       })
