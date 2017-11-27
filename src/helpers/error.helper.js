@@ -4,7 +4,7 @@ const uuid = '04';
 
 var error = {};
 
-time.construct = function(identifier, occurence){
+error.construct = function(identifier, occurence){
   var error = {};
   error.code = errors[identifier].code;
   error.name = uuid + occurence + identifier;
@@ -12,4 +12,4 @@ time.construct = function(identifier, occurence){
   return error;
 }
 
-module.exports = time;
+module.exports = error;
