@@ -23,6 +23,7 @@ mongoose.connection.on('error',function (err) {
 // When the connection is disconnected
 mongoose.connection.on('disconnected', function () {
   console.log('Mongoose default connection disconnected');
+  process.exit(1);
 });
 
 // If the Node process ends, close the Mongoose connection
