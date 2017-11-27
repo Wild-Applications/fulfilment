@@ -288,20 +288,17 @@ helper.complete = function(call, callback){
           console.log(paymentErr);
           return callback(paymentErr, null);
         }
-        console.log('response', response);
         if(response && response.captured == false){
           order.status = "REFUNDED";
         }else{
           order.status = "COMPLETE";
         }
-
-          console.log('response ',response);
         order.save((err) => {
           console.log('save err', err);
-          if(err){
-            return callback(null, response);
+          if(response.captured){
+            return callback(null,response);
           }else{
-            return callback(null, response);
+            return callback({message:errors[0011], code:'04000011'},null);
           }
         });
       })

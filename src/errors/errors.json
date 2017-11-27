@@ -8,5 +8,6 @@
   "0007": "Unable to cancel order. Please wait a moment and try again.",
   "0008": "Unable to refund the payment at this time. Please try again in a moment.",
   "0009": "Not all parameters were supplied",
-  "0010": "Unable to save order"
+  "0010": "Unable to save order",
+  "0011": "Order has already been cancelled or refunded"
 }
