@@ -137,7 +137,7 @@ helper.getCompletedByDay = function(call, callback){
         Order.find({
           $and:[
             {premises: result._id},
-            {status: {$in: ['COMPLETE', 'CANCELLED']}},
+            {status: {$in: ['COMPLETE', 'CANCELLED', 'REFUNDED']}},
             {createdAt: { $gte: new Date(call.request.year,parseInt(call.request.month) - 1,call.request.day)}},
             {createdAt: { $lt: new Date(call.request.year,parseInt(call.request.month) - 1,call.request.day,23,59,59,999)}}
           ]
@@ -179,7 +179,7 @@ helper.getOrderBreakdown = function(call, callback){
         //aggregate orders based on premises match and day
         Order.aggregate([
           { $match: { $and: [
-            {status: {$in: ['COMPLETE', 'CANCELLED']}},
+            {status: {$in: ['COMPLETE', 'CANCELLED', 'REFUNDED']}},
             {premises: mongoose.Types.ObjectId(result._id.toString())}
           ]}},
           {
