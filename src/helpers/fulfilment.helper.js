@@ -281,6 +281,7 @@ helper.complete = function(call, callback){
     }
     Order.findOne({_id: call.request.order}, function(orderRetrievalError, order){
       if(orderRetrievalError){
+        console.log(orderRetrievalError);
         return callback({message:JSON.stringify({code:'04000004', error:errors['0004']})}, null);
       }
       paymentClient.capturePayment({order: call.request.order}, call.metadata, function(paymentErr, response){
