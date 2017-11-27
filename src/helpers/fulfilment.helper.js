@@ -299,7 +299,7 @@ helper.complete = function(call, callback){
             return callback(null,response);
           }else{
             console.log(errors['0011']);
-            return callback({message:errors['0011'], code:04000011},null);
+            return callback({message:errors['0011'], code:04000011, status: 'INTERNAL'},null);
           }
         });
       })
