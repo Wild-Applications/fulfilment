@@ -375,7 +375,6 @@ helper.cancel = function(call, callback){
     console.log('got here');
     premisesClient.get({}, call.metadata, function(err, premises){
       if(err){
-        console.log("premises err ", err);
         return callback({name: '04010006', message:errors['0006']},null);
       }else{
         Order.findOne({ $and: [
@@ -389,6 +388,13 @@ helper.cancel = function(call, callback){
           if(order){
             paymentClient.refundPayment({order:order._id.toString()}, call.metadata, (err, result) => {
               if(err){
+                var errorCode = err.metadata.get('error_code')[0];
+                if(errorCode && errorCode.substr(errorCode.length - 4, 4) == '0006'){
+                  //payment didnt exist, so mark order as cancelled;
+                  order.status = "CANCELLED";
+                  order.save(() => {
+                  });
+                }
                 return callback({name: '04000008', message:errors['0008']}, null);
               }
               order.status = "CANCELLED";
