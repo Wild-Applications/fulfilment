@@ -281,12 +281,16 @@ helper.complete = function(call, callback){
     }
     Order.findOne({_id: call.request.order}, function(orderRetrievalError, order){
       if(orderRetrievalError){
-        console.log(orderRetrievalError);
         return callback({message:JSON.stringify({code:'04000004', error:errors['0004']})}, null);
       }
       paymentClient.capturePayment({order: call.request.order}, call.metadata, function(paymentErr, response){
         if(paymentErr){
-          console.log(paymentErr);
+          var errorCode = paymentErr.metadata.get('error_code')[0];
+          if(errorCode && errorCode.substring(errorCode.length - 4, 4) == '0006'){
+            //payment didnt exist, so mark order as cancelled;
+            order.status = "CANCELLED";
+            order.save();
+          }
           return callback(paymentErr, null);
         }
         if(response && response.captured == false){
