@@ -394,7 +394,8 @@ helper.cancel = function(call, callback){
                 console.log('error code ', errorCode);
                 if(errorCode && errorCode.substr(errorCode.length - 4, 4) == '0006'){
                   //payment didnt exist, so mark order as cancelled;
-                  order.status = "CANCELLED";
+                  order.status = 'CANCELLED';
+                  console.log(order.status);
                   console.log('cancelling order');
                   order.save((err) => {
                     console.log('save err', err);
