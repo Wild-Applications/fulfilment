@@ -286,6 +286,7 @@ helper.complete = function(call, callback){
       paymentClient.capturePayment({order: call.request.order}, call.metadata, function(paymentErr, response){
         if(paymentErr){
           var errorCode = paymentErr.metadata.get('error_code')[0];
+          console.log(errorCode);
           if(errorCode && errorCode.substring(errorCode.length - 4, 4) == '0006'){
             //payment didnt exist, so mark order as cancelled;
             order.status = "CANCELLED";
