@@ -391,6 +391,7 @@ helper.cancel = function(call, callback){
             paymentClient.refundPayment({order:order._id.toString()}, call.metadata, (err, result) => {
               if(err){
                 var errorCode = err.metadata.get('error_code')[0];
+                console.log('error code ', errorCode);
                 if(errorCode && errorCode.substr(errorCode.length - 4, 4) == '0006'){
                   //payment didnt exist, so mark order as cancelled;
                   order.status = "CANCELLED";
