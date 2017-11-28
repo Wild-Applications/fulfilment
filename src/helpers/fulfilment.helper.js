@@ -377,6 +377,7 @@ helper.cancel = function(call, callback){
       if(err){
         return callback({name: '04010006', message:errors['0006']},null);
       }else{
+        console.log('got premises');
         Order.findOne({ $and: [
           {_id: call.request._id},
           {premises: premises._id}
@@ -385,6 +386,7 @@ helper.cancel = function(call, callback){
             console.log("order err ", err);
             return callback({name: '04000006', message:errors['0006']}, null);
           }
+          console.log('order', order);
           if(order){
             paymentClient.refundPayment({order:order._id.toString()}, call.metadata, (err, result) => {
               if(err){
