@@ -372,36 +372,29 @@ helper.cancel = function(call, callback){
     if(err){
       return callback({name:'04000005', message:errors['0005']},null);
     }
-    console.log('got here');
     premisesClient.get({}, call.metadata, function(err, premises){
       if(err){
         return callback({name: '04010006', message:errors['0006']},null);
       }else{
-        console.log('got premises');
         Order.findOne({ $and: [
           {_id: call.request._id},
           {premises: premises._id}
         ]}, (err, order) => {
           if(err){
-            console.log("order err ", err);
             return callback({name: '04000006', message:errors['0006']}, null);
           }
-          console.log('order', order);
           if(order){
             paymentClient.refundPayment({order:order._id.toString()}, call.metadata, (err, result) => {
               if(err){
                 var errorCode = err.metadata.get('error_code')[0];
-                console.log('error code ', errorCode);
                 if(errorCode && errorCode.substr(errorCode.length - 4, 4) == '0006'){
                   //payment didnt exist, so mark order as cancelled;
                   order.status = 'CANCELLED';
-                  console.log(order.status);
-                  console.log('cancelling order');
+
                   order.save((err) => {
-                    console.log('save err', err);
+
                   });
                 }
-                console.log(err);
                 return callback({name: '04000008', message:errors['0008']}, null);
               }
               order.status = "CANCELLED";
@@ -486,7 +479,6 @@ function getProducts(orders, metadata){
 }
 
 function getTables(orders, metadata){
-  console.log("requesting for " + orders.length);
   var tableCall = function(order, metadata){
     return new Promise(function(resolve, reject){
       tableClient.get({_id: order.table}, metadata, function(err, result){
@@ -509,7 +501,6 @@ function getTables(orders, metadata){
 }
 
 function getPremises(orders, metadata){
-  console.log("requesting for " + orders.length);
   var premisesCall = function(order, metadata){
     return new Promise(function(resolve, reject){
       premisesClient.getPremises({premisesId: order.premises}, metadata, function(err, result){
