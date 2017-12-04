@@ -59,7 +59,7 @@ helper.getPending = function(call, callback){
           ]
         }).exec(function(err, resultOrders){
           if(err){
-            return callback({message:JSON.stringify({code:'04000001', error:errors['0001']})}, null);
+            return callback(errors['0001'], null);
           }
           var results = [];
           resultOrders.forEach(function(order){
@@ -73,7 +73,7 @@ helper.getPending = function(call, callback){
               return callback(null, results);
             });
           }, error => {
-            return callback({message:JSON.stringify({code:'04000002', error:errors['0002']})}, null);
+            return callback(errors['0002'], null);
           })
         })
       }
@@ -100,7 +100,7 @@ helper.getCompleted = function(call, callback){
           ]
         }).exec(function(err, resultOrders){
           if(err){
-            return callback({message:JSON.stringify({code:'04010001', error:errors['0001']})}, null);
+            return callback(errors['0001'], null);
           }
           var results = [];
           resultOrders.forEach(function(order){
@@ -114,7 +114,7 @@ helper.getCompleted = function(call, callback){
               return callback(null, results);
             });
           }, error => {
-            return callback({message:JSON.stringify({code:'04010002', error:errors['0002']})}, null);
+            return callback(errors['0002'], null);
           })
         })
       }
@@ -133,7 +133,6 @@ helper.getCompletedByDay = function(call, callback){
       if(err){
         return callback({message:err},null);
       }else{
-        console.log(new Date(call.request.year,call.request.month,call.request.day));
         Order.find({
           $and:[
             {premises: result._id},
@@ -143,7 +142,7 @@ helper.getCompletedByDay = function(call, callback){
           ]
         }).exec(function(err, resultOrders){
           if(err){
-            return callback({message:JSON.stringify({code:'04010001', error:errors['0001']})}, null);
+            return callback(errors['0001'], null);
           }
 
           var results = [];
@@ -158,7 +157,7 @@ helper.getCompletedByDay = function(call, callback){
               return callback(null, results);
             });
           }, error => {
-            return callback({message:JSON.stringify({code:'04010002', error:errors['0002']})}, null);
+            return callback(errors['0002'], null);
           })
         });
       }
@@ -195,7 +194,7 @@ helper.getOrderBreakdown = function(call, callback){
           }
         ]).exec(function(err, orders){
           if(err){
-            return callback({message:JSON.stringify({code:'04040001', error:errors['0001']})}, null);
+            return callback(errors['0001'], null);
           }
           console.log(orders);
           return callback(null, orders);
@@ -214,7 +213,7 @@ helper.get = function(call, callback){
 
     Order.find({owner: token.sub}, function(orderErr, resultOrders){
       if(orderErr){
-        return callback({message:JSON.stringify({code:'04020001', error:errors['0001']})}, null);
+        return callback(errors['0001'], null);
       }
       var results = [];
       resultOrders.forEach(function(order){
@@ -231,7 +230,7 @@ helper.get = function(call, callback){
           });
         });
       }, error => {
-        return callback({message:JSON.stringify({code:'04020002', error:errors['0002']})}, null);
+        return callback(errors['0002'], null);
       })
     });
   });
@@ -248,7 +247,7 @@ helper.create = function(call, callback){
     var newOrder = new Order(call.request);
     newOrder.save(function(err, result){
       if(err){
-        return callback({message:JSON.stringify({code:'04000003', error:errors['0003']})},null);
+        return callback(errors['0003'],null);
       }
       var order = {};
       order.subtotal = result.subtotal * 100;
@@ -262,7 +261,7 @@ helper.create = function(call, callback){
         if(err){
           result.remove(function(deleteError){
             if(deleteError){
-              return callback({message:JSON.stringify({code:'04010003', error:errors['0003']})}, null);
+              return callback(errors['0003'], null);
             }else{
               return callback(err,null);
             }
@@ -281,14 +280,12 @@ helper.complete = function(call, callback){
     }
     Order.findOne({_id: call.request.order}, function(orderRetrievalError, order){
       if(orderRetrievalError){
-        return callback({message:JSON.stringify({code:'04000004', error:errors['0004']})}, null);
+        return callback(errors['0004'], null);
       }
       paymentClient.capturePayment({order: call.request.order}, call.metadata, function(paymentErr, response){
         if(paymentErr){
           var errorCode = paymentErr.metadata.get('error_code')[0];
-          console.log(errorCode);
           if(errorCode && errorCode.substr(errorCode.length - 4, 4) == '0006'){
-            console.log('here');
             //payment didnt exist, so mark order as cancelled;
             order.status = "CANCELLED";
             order.save(() => {
@@ -333,7 +330,7 @@ helper.update = function(call, callback){
       }else{
         Order.findOne({ $and: [{_id: call.request._id}, {premises: result._id}]}, function(err, order){
           if(err){
-            return callback({message:JSON.stringify({code:'04030001', error:errors['0001']})}, null);
+            return callback(errors['0001'], null);
           }
           delete call.request._id;
           for(var key in call.request.fieldsToUpdate){
@@ -357,9 +354,7 @@ helper.delete = function(call, callback){
 
     Order.findByIdAndRemove({ $and: [{_id: call.request._id}, {owner: token.sub}]}, function(err, orderReply){
       if(err){
-        console.log(err);
-
-        return callback({message:'err'}, null);
+        return callback(errors['0001'], null);
       }
 
       return callback(null, {});
@@ -370,18 +365,18 @@ helper.delete = function(call, callback){
 helper.cancel = function(call, callback){
   jwt.verify(call.metadata.get('authorization')[0], process.env.JWT_SECRET, function(err, token){
     if(err){
-      return callback({name:'04000005', message:errors['0005']},null);
+      return callback(errors['0005'],null);
     }
     premisesClient.get({}, call.metadata, function(err, premises){
       if(err){
-        return callback({name: '04010006', message:errors['0006']},null);
+        return callback(errors['0006'],null);
       }else{
         Order.findOne({ $and: [
           {_id: call.request._id},
           {premises: premises._id}
         ]}, (err, order) => {
           if(err){
-            return callback({name: '04000006', message:errors['0006']}, null);
+            return callback(errors['0006'], null);
           }
           if(order){
             paymentClient.refundPayment({order:order._id.toString()}, call.metadata, (err, result) => {
@@ -395,18 +390,18 @@ helper.cancel = function(call, callback){
 
                   });
                 }
-                return callback({name: '04000008', message:errors['0008']}, null);
+                return callback(errors['0008'], null);
               }
               order.status = "CANCELLED";
               order.save((err) => {
                 if(err){
-                  return callback({name:'04000007', message:errors['0007']}, null);
+                  return callback(errors['0007'], null);
                 }
                 return callback(null,{});
               });
             })
           }else{
-            return callback({name:'04020006', message:errors['0006']}, null);
+            return callback(errors['0006'], null);
           }
         })
       }
@@ -422,19 +417,19 @@ helper.wasRefunded = (call, callback) => {
       }
       Order.findOne({_id: response.order_id}, (err, order) => {
         if(err){
-          return callback({message:errors['0001'], name: '04060001'}, null);
+          return callback(errors['0001'], null);
         }
         order.status = 'REFUNDED';
         order.save((err) => {
           if(err){
-            return callback({message: errors['0010'], name:'04000010'}, null);
+            return callback(errors['0010'], null);
           }
           return callback(null, {acknowledged: true});
         })
       });
     });
   }else{
-    return callback({message: errors['0009'], name: '04000009'}, null);
+    return callback(errors['0009'], null);
   }
 }
 

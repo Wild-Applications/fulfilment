@@ -1,13 +1,13 @@
 {
-  "0001": {"message": "Unable to retrieve order from database", "status": 500},
-  "0002": {"message": "Unable to populate products within order", "status": 500},
-  "0003": {"message": "Unable to create new order", "status": 500},
-  "0004": {"message": "Failed to capture payment", "status": 500},
-  "0005": "You do not have permission to access this method. Please pass the correct permissions.",
-  "0006": "That order does not exist or you do not have permission to cancel it.",
-  "0007": "Unable to cancel order. Please wait a moment and try again.",
-  "0008": "Unable to refund the payment at this time. Please try again in a moment.",
-  "0009": "Not all parameters were supplied",
-  "0010": "Unable to save order",
+  "0001": {"message": "Unable to retrieve order from database", "code": 500},
+  "0002": {"message": "Unable to populate products within order", "code": 500},
+  "0003": {"message": "Unable to create new order", "code": 500},
+  "0004": {"message": "Failed to capture payment", "code": 500},
+  "0005": {"message": "You do not have permission to access this method. Please pass the correct permissions.", "code": 401},
+  "0006": {"message": "That order does not exist or you do not have permission to cancel it.", "code": 403},
+  "0007": {"message": "Unable to cancel order. Please wait a moment and try again.", "code": 500},
+  "0008": {"message": "Unable to refund the payment at this time. Please try again in a moment.", "code": 500},
+  "0009": {"message": "Not all parameters were supplied", "code": 400},
+  "0010": {"message": "Unable to save order", "code": 500},
   "0011": {"message": "Order has already been cancelled or refunded", "code":400}
 }
