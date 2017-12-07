@@ -217,9 +217,10 @@ helper.getStatistics = function(call, callback){
       }else{
         var calls = [];
         calls[0] = getWeeklyOrderBreakdown(result._id.toString());
-
+        calls[1] = getDailyOrderBreakdown(result._id.toString());
         Promise.all(calls).then(data => {
           console.log(data[0]);
+          console.log(data[1]);
         }, error => {
           console.log(error);
         })
@@ -568,6 +569,45 @@ function getWeeklyOrderBreakdown(premisesId){
       {
         $sort: {
           "_id.day": 1, "_id.month": 1, "_id.year": 1
+        }
+      }
+    ]).exec(function(err, orders){
+      if(err){
+        return reject(err);
+      }
+
+      return resolve(orders);
+    })
+  })
+}
+
+function getDailyOrderBreakdown(premisesId){
+  return new Promise((resolve, reject) => {
+    var now = new Date();
+    var startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    var tomorrow = moment(startOfToday).add(1, 'days').toDate();
+    var endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+    var weekAgo = moment(endOfToday).subtract(7, 'days').toDate();
+
+    //aggregate orders based on premises match and day
+    Order.aggregate([
+      { $match: { $and: [
+        {status: 'COMPLETE'},
+        {premises: mongoose.Types.ObjectId(premisesId)},
+        {createdAt:{
+          $gte: startOfToday,
+          $lt: endOfToday
+        }}
+      ]}},
+      {
+        $group: {
+          _id: {hour: {$hour: "$createdAt"}},
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $sort: {
+          "_id.hour": 1
         }
       }
     ]).exec(function(err, orders){
