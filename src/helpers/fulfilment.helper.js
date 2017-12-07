@@ -215,40 +215,13 @@ helper.getStatistics = function(call, callback){
       if(err){
         return callback(errors['0012'],null);
       }else{
+        var calls = [];
+        calls[0] = getWeeklyOrderBreakdown(result._id.toString());
 
-        var now = new Date();
-        var startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        var tomorrow = moment(startOfToday).add(1, 'days').toDate();
-        var endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
-        var weekAgo = moment(endOfToday).subtract(7, 'days').toDate();
-
-        //aggregate orders based on premises match and day
-        Order.aggregate([
-          { $match: { $and: [
-            {status: 'COMPLETE'},
-            {premises: mongoose.Types.ObjectId(result._id.toString())},
-            {createdAt:{
-              $gte: weekAgo,
-              $lt: endOfToday
-            }}
-          ]}},
-          {
-            $group: {
-              _id: {month: {$month: "$createdAt"}, day: {$dayOfMonth: "$createdAt"}, year: {$year: "$createdAt"}},
-              count: { $sum: 1 }
-            }
-          },
-          {
-            $sort: {
-              "_id.day": 1, "_id.month": 1, "_id.year": 1
-            }
-          }
-        ]).exec(function(err, orders){
-          if(err){
-            return callback(errors['0001'], null);
-          }
-          console.log(orders);
-          return callback(null, orders);
+        Promise.all(calls).then(data => {
+          console.log(data[0]);
+        }, error => {
+          console.log(error);
         })
       }
     });
@@ -567,6 +540,45 @@ function getPremises(orders, metadata){
   return Promise.all(requests);
 }
 
+
+function getWeeklyOrderBreakdown(premisesId){
+  return new Promise((premisesId) => {
+    var now = new Date();
+    var startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    var tomorrow = moment(startOfToday).add(1, 'days').toDate();
+    var endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+    var weekAgo = moment(endOfToday).subtract(7, 'days').toDate();
+
+    //aggregate orders based on premises match and day
+    Order.aggregate([
+      { $match: { $and: [
+        {status: 'COMPLETE'},
+        {premises: mongoose.Types.ObjectId(premisesId)},
+        {createdAt:{
+          $gte: weekAgo,
+          $lt: endOfToday
+        }}
+      ]}},
+      {
+        $group: {
+          _id: {month: {$month: "$createdAt"}, day: {$dayOfMonth: "$createdAt"}, year: {$year: "$createdAt"}},
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $sort: {
+          "_id.day": 1, "_id.month": 1, "_id.year": 1
+        }
+      }
+    ]).exec(function(err, orders){
+      if(err){
+        return reject(err);
+      }
+
+      return resolve(orders);
+    })
+  })
+}
 
 
 module.exports = helper;
