@@ -69,6 +69,9 @@ server.addService(proto.order.FulfilmentService.service, {
   },
   wasRefunded: (call, callback) => {
     fulfilmentHelper.wasRefunded(call, callback);
+  },
+  getStatistics: (call, callback) => {
+    fulfilmentHelper.getStatistics(call, callback);
   }
 
 });

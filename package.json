@@ -12,6 +12,7 @@
   "dependencies": {
     "grpc": "1.7.2",
     "jsonwebtoken": "8.1.0",
+    "moment": "^2.19.3",
     "mongoose": "^4.13.5"
   }
 }

@@ -20,6 +20,7 @@ service FulfilmentService {
   rpc cancel ( DeleteRequest ) returns (Empty){}
   rpc complete (CaptureRequest) returns (CaptureResponse){}
   rpc wasRefunded (ForcedRefund) returns (ForcedRefundResponse){}
+  rpc getStatistics (Empty) returns (StatisticsResponse){}
 }
 
 message Empty {
@@ -120,4 +121,8 @@ message ForcedRefund{
 
 message ForcedRefundResponse{
   bool acknowledged = 1;
+}
+
+message StatisticsResponse{
+  
 }

@@ -3,7 +3,8 @@
 var jwt = require('jsonwebtoken'),
 Order = require('../models/order.schema.js'),
 errors = require('../errors/errors.json'),
-mongoose = require('mongoose');;
+mongoose = require('mongoose'),
+moment = require('moment');
 
 var grpc = require("grpc");
 var paymentDescriptor = grpc.load(__dirname + '/../proto/payment.proto').payment;
@@ -180,6 +181,56 @@ helper.getOrderBreakdown = function(call, callback){
           { $match: { $and: [
             {status: {$in: ['COMPLETE', 'CANCELLED', 'REFUNDED']}},
             {premises: mongoose.Types.ObjectId(result._id.toString())}
+          ]}},
+          {
+            $group: {
+              _id: {month: {$month: "$createdAt"}, day: {$dayOfMonth: "$createdAt"}, year: {$year: "$createdAt"}},
+              count: { $sum: 1 }
+            }
+          },
+          {
+            $sort: {
+              "_id.day": 1, "_id.month": 1, "_id.year": 1
+            }
+          }
+        ]).exec(function(err, orders){
+          if(err){
+            return callback(errors['0001'], null);
+          }
+          console.log(orders);
+          return callback(null, orders);
+        })
+      }
+    });
+  })
+}
+
+helper.getStatistics = function(call, callback){
+  jwt.verify(call.metadata.get('authorization')[0], process.env.JWT_SECRET, function(err, token){
+    if(err){
+      return callback(errors['0005'],null);
+    }
+
+    premisesClient.get({}, call.metadata, function(err, result){
+      if(err){
+        return callback(errors['0012'],null);
+      }else{
+
+        var now = new Date();
+        var startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        var tomorrow = moment(startOfToday).add(1, 'days').toDate();
+        var endOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+        var weekAgo = moment(endOfToday).subtract(7, 'days').toDate();
+
+        //aggregate orders based on premises match and day
+        Order.aggregate([
+          { $match: { $and: [
+            {status: 'COMPLETE'},
+            {premises: mongoose.Types.ObjectId(result._id.toString())},
+            {createdAt:{
+              $gte: weekAgo,
+              $lt: endOfToday
+            }}
           ]}},
           {
             $group: {
