@@ -542,7 +542,7 @@ function getPremises(orders, metadata){
 
 
 function getWeeklyOrderBreakdown(premisesId){
-  return new Promise((premisesId) => {
+  return new Promise((resolve, reject) => {
     var now = new Date();
     var startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     var tomorrow = moment(startOfToday).add(1, 'days').toDate();
