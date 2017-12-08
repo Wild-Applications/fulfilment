@@ -124,12 +124,19 @@ message ForcedRefundResponse{
 }
 
 message StatisticsResponse{
-  repeated WeeklyCountObject weekly = 1;
-  repeated DailyCountObject daily = 2;
+  WeeklySplitObject weekly = 1;
+  DailySplitObject daily = 2;
 }
 
 
 //statistic response message Types
+message WeeklySplitObject{
+  repeated WeeklyCountObject orders = 1;
+}
+
+message DailySplitObject{
+  repeated DailyCountObject orders = 1;
+}
 
 message WeeklyCountObject{
   DateRepresentation _id = 1;
