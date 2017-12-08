@@ -276,7 +276,7 @@ helper.create = function(call, callback){
         return callback(errors['0003'],null);
       }
       var order = {};
-      order.subtotal = result.subtotal * 100;
+      order.subtotal = result.subtotal;
       order.currency = 'gbp';
       order.premises = result.premises.toString();
       order.source = call.request.source;
