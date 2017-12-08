@@ -219,10 +219,10 @@ helper.getStatistics = function(call, callback){
         calls[0] = getWeeklyOrderBreakdown(result._id.toString());
         calls[1] = getDailyOrderBreakdown(result._id.toString());
         Promise.all(calls).then(data => {
-          console.log(data[0]);
-          console.log(data[1]);
+          console.log('weekly', data[0]);
+          console.log('daily', data[1]);
         }, error => {
-          console.log(error);
+          console.log('error', error);
         })
       }
     });
