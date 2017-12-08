@@ -580,7 +580,7 @@ function getWeeklyOrderBreakdown(premisesId){
 
       return resolve(orders);
     })
-  })
+  })//
 }
 
 function getDailyOrderBreakdown(premisesId){
