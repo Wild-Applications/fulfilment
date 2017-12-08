@@ -13,11 +13,11 @@ var schema = new mongoose.Schema({
 });
 
 
-schema.path('price').set(function(p){
+schema.path('subtotal').set(function(p){
   return p * 100;
 });
 
-schema.path('price').get(function(p){
+schema.path('subtotal').get(function(p){
   return parseFloat((p/100).toFixed(2));
 });
 
