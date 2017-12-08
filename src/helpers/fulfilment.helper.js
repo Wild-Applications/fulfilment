@@ -221,6 +221,7 @@ helper.getStatistics = function(call, callback){
         Promise.all(calls).then(data => {
           console.log('weekly', data[0]);
           console.log('daily', data[1]);
+          callback(null, {});
         }, error => {
           console.log('error', error);
         })
