@@ -564,7 +564,8 @@ function getWeeklyOrderBreakdown(premisesId){
       {
         $group: {
           _id: {month: {$month: "$createdAt"}, day: {$dayOfMonth: "$createdAt"}, year: {$year: "$createdAt"}},
-          count: { $sum: 1 }
+          count: { $sum: 1 },
+          sales: { $sum: '$subtotal'}
         }
       },
       {
@@ -603,7 +604,8 @@ function getDailyOrderBreakdown(premisesId){
       {
         $group: {
           _id: {hour: {$hour: "$createdAt"}},
-          count: { $sum: 1 }
+          count: { $sum: 1 },
+          sales: { $sum: '$subtotal'}
         }
       },
       {
