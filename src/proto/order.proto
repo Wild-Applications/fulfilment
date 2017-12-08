@@ -124,5 +124,29 @@ message ForcedRefundResponse{
 }
 
 message StatisticsResponse{
-  
+  repeated WeeklyCountObject weekly = 1;
+  repeated DailyCountObject daily = 2;
+}
+
+
+//statistic response message Types
+
+message WeeklyCountObject{
+  DateRepresentation _id = 1;
+  double count = 2;
+}
+
+message DailyCountObject{
+  HourRepresentation _id = 1;
+  double count = 2;
+}
+
+message DateRepresentation{
+  double day = 1;
+  double month = 2;
+  double year = 3;
+}
+
+message HourRepresentation {
+  double hour = 1;
 }
