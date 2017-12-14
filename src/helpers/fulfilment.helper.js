@@ -297,9 +297,9 @@ helper.create = function(call, callback){
               return callback(err,null);
             }
           })
+        }else{
+          return callback(null, {_id: result._id.toString()});
         }
-        console.log(result);
-        return callback(null, {_id: result._id.toString()});
       })
     });
   });
