@@ -290,8 +290,10 @@ helper.create = function(call, callback){
           console.log(err);
           result.remove(function(deleteError){
             if(deleteError){
+              console.log('didnt delete fine');
               return callback(errors['0003'], null);
             }else{
+              console.log('deleted fine')
               return callback(err,null);
             }
           })
