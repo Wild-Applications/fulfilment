@@ -266,6 +266,7 @@ helper.get = function(call, callback){
 helper.create = function(call, callback){
   jwt.verify(call.metadata.get('authorization')[0], process.env.JWT_SECRET, function(err, token){
     if(err){
+      console.log(err);
       return callback({message:err},null);
     }
 
@@ -273,6 +274,7 @@ helper.create = function(call, callback){
     var newOrder = new Order(call.request);
     newOrder.save(function(err, result){
       if(err){
+        console.log(err);
         return callback(errors['0003'],null);
       }
       var order = {};
@@ -285,6 +287,7 @@ helper.create = function(call, callback){
 
       paymentClient.createPayment(order, call.metadata, function(err, charges){
         if(err){
+          console.log(err);
           result.remove(function(deleteError){
             if(deleteError){
               return callback(errors['0003'], null);
@@ -293,6 +296,7 @@ helper.create = function(call, callback){
             }
           })
         }
+        console.log(result);
         return callback(null, {_id: result._id.toString()});
       })
     });
