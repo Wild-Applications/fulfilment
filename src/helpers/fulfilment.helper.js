@@ -64,6 +64,7 @@ helper.getPending = function(call, callback){
           }
           var results = [];
           resultOrders.forEach(function(order){
+            console.log(order.subtotal);
             results[results.length] = formatOrder(order);
           });
 
