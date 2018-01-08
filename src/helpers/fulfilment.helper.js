@@ -38,6 +38,7 @@ function formatOrder(order){
 }
 
 helper.getPending = function(call, callback){
+  console.log('Received Request');
   //protected route so verify token;
   jwt.verify(call.metadata.get('authorization')[0], process.env.JWT_SECRET, function(err, token){
     if(err){
@@ -49,6 +50,7 @@ helper.getPending = function(call, callback){
 
 
     premisesClient.get({}, call.metadata, function(err, result){
+      console.log('got premises');
       if(err){
         return callback({message:err},null);
       }else{
@@ -59,6 +61,7 @@ helper.getPending = function(call, callback){
             {status: {$in: ['PENDING', 'IN_PROGRESS']}}
           ]
         }).exec(function(err, resultOrders){
+          console.log('got orders');
           if(err){
             return callback(errors['0001'], null);
           }
