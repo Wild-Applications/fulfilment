@@ -510,9 +510,12 @@ function getProducts(orders, metadata){
 }
 
 function getTables(orders, metadata){
+  console.log('gettings tables');
   var tableCall = function(order, metadata){
     return new Promise(function(resolve, reject){
       tableClient.get({_id: order.table}, metadata, function(err, result){
+        console.log(err);
+        console.log('got tables?');
         if(err){return reject(err)}
         order.table = result;
         return resolve(order);
