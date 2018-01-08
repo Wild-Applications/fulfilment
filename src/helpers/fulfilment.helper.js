@@ -471,11 +471,13 @@ helper.wasRefunded = (call, callback) => {
 
 function getProducts(orders, metadata){
 
-
+console.log('getting products');
   var productsCall = function(order, metadata){
     return new Promise(function(resolve, reject){
       if(order.products.length > 0){
         productClient.getBatch(order.products, metadata, function(err, results){
+          console.log('got products');
+          console.log(err);
           if(err){return reject(err)}
           var resultProductArray = [];
           order.products.forEach(function(product){
