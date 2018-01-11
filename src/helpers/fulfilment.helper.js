@@ -219,16 +219,20 @@ helper.getStatistics = function(call, callback){
       if(err){
         return callback(errors['0012'],null);
       }else{
-        var calls = [];
-        calls[0] = getWeeklyOrderBreakdown(result._id.toString());
-        calls[1] = getDailyOrderBreakdown(result._id.toString());
-        Promise.all(calls).then(data => {
-          console.log('weekly', data[0]);
-          console.log('daily', data[1]);
-          callback(null, {weekly:data[0], daily: data[1]});
-        }, error => {
-          console.log('error', error);
-        })
+        if(result){
+          var calls = [];
+          calls[0] = getWeeklyOrderBreakdown(result._id.toString());
+          calls[1] = getDailyOrderBreakdown(result._id.toString());
+          Promise.all(calls).then(data => {
+            console.log('weekly', data[0]);
+            console.log('daily', data[1]);
+            callback(null, {weekly:data[0], daily: data[1]});
+          }, error => {
+            console.log('error', error);
+          })
+        }else{
+          return callback(errors['0012'], null);
+        }
       }
     });
   })
